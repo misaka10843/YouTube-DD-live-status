@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
+# 获取DD列表
 def GetVtb():
     with open('./DD.json', 'rb') as fp:
         json_data = json.load(fp)
@@ -12,14 +13,15 @@ def GetVtb():
     return channel
 
 
-def IsLiveYT():
-    ChannelUrl = "https://www.youtube.com/channel/UCdn5BQ06XqgXoAxIhbqw5Rg/live"
+# 主判断器
+def IsLiveYT(ChannelUrl, ChannelName):
+    ChannelLiveUrl = ChannelUrl + "/live"
     proxy = '127.0.0.1:8099'
     proxies = {
         'http': 'http://' + proxy,
         'https': 'http://' + proxy,
     }
-    page = requests.get(ChannelUrl, cookies={
+    page = requests.get(ChannelLiveUrl, cookies={
         'CONSENT': 'YES+42'}, proxies=proxies, timeout=10)
     soup = BeautifulSoup(page.content, "html.parser")
 
@@ -28,16 +30,26 @@ def IsLiveYT():
     live = soup.find("link", {"rel": "canonical"}).get(
         "href")
     # TODO 输出并组成json
-    if not live == "https://www.youtube.com/channel/UCdn5BQ06XqgXoAxIhbqw5Rg":
-        print("Streaming")
+    if not live == ChannelUrl:
+        print(ChannelName + " is Streaming")
         return live
     else:
-        print("Not Streaming")
+        print(ChannelName + " Not Streaming")
         return "null"
 
 
-def GetWaitTime():
-    LiveUrl = IsLiveYT()
+# 时间转换+时区转换
+def ConversionTime(LiveUrl):
+    # 引用获取开播时间
+    GetTime = GetWaitTime(LiveUrl)
+    GetTime = GetTime.split("+")[0]
+    GetTime = datetime.datetime.strptime(GetTime, "%Y-%m-%dT%H:%M:%S")
+    UTC8 = (GetTime + datetime.timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
+    return UTC8
+
+
+# 获取开播时间(理论)
+def GetWaitTime(LiveUrl):
     proxy = '127.0.0.1:8099'
     proxies = {
         'http': 'http://' + proxy,
@@ -53,17 +65,30 @@ def GetWaitTime():
     return LiveTime
 
 
-def ConversionTime():
-    GetTime = GetWaitTime()
-    GetTime = GetTime.split("+")[0]
-    GetTime = datetime.datetime.strptime(GetTime, "%Y-%m-%dT%H:%M:%S")
-    UTC8 = (GetTime + datetime.timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
-    return UTC8
+def main():
+    DDJson = '{"channel": ['
+    for i in GetVtb():
+        # 判断频道ID格式
+        if i["isC"] == 0:
+            ChannelUrl = "https://www.youtube.com/channel/" + i["Cid"]
+        elif i["isC"] == 1:
+            ChannelUrl = "https://www.youtube.com/c/" + i["Cid"]
+        else:
+            ChannelUrl = "https://www.youtube.com/user/" + i["Cid"]
+        # 将值传入主页面判断
+        LiveUrl = IsLiveYT(ChannelUrl, i["en"])
+        # 是否正在直播，在就获取直播时间，不在就直接返回
+        if not LiveUrl == "null":
+            StartTime = ConversionTime(LiveUrl)
+            DDJson = DDJson + '{"on":"' + i["on"] + '","en":"' + i["en"] + '","cn":"' + i[
+                "cn"] + '","live":true,"start_time":"' + StartTime + '","live_url":"' + LiveUrl + '"},'
+        else:
+            DDJson = DDJson + '{"on":"' + i["on"] + '","en":"' + i["en"] + '","cn":"' + i[
+                "cn"] + '","live":false,"start_time":null,"live_url":null},'
+    # 出循环，结尾json
+    DDJson = DDJson[:-1] + "]}"
+    print(DDJson)
 
 
 if __name__ == "__main__":
-    IsLiveYT()
-    if IsLiveYT() == "null":
-        print("并未直播")
-    else:
-        print(ConversionTime())
+    main()
