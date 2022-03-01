@@ -48,7 +48,7 @@ jobs:
         run: |
           git config --local user.email "misaka10843@outlook.jp"
           git config --local user.name "misaka10843"
-          git add ./DDLive.json
+          git add .
           git commit -m "`update '+%Y-%m-%d %H:%M:%S'`" #动态提交信息
       # 推送到github仓库
       - name: Push changes
