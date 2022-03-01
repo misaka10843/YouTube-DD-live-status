@@ -1,3 +1,4 @@
+import datetime
 import json
 
 import requests
@@ -52,5 +53,17 @@ def GetWaitTime():
     return LiveTime
 
 
+def ConversionTime():
+    GetTime = GetWaitTime()
+    GetTime = GetTime.split("+")[0]
+    GetTime = datetime.datetime.strptime(GetTime, "%Y-%m-%dT%H:%M:%S")
+    UTC8 = (GetTime + datetime.timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
+    return UTC8
+
+
 if __name__ == "__main__":
-    print(GetWaitTime())
+    IsLiveYT()
+    if IsLiveYT() == "null":
+        print("并未直播")
+    else:
+        print(ConversionTime())
