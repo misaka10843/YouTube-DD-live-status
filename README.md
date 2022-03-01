@@ -17,7 +17,9 @@
 
 您可以点击[这里](https://github.com/misaka10843/YouTube-DD-live-status/blob/main/DDLive.json) 查看文件
 
-`https://github.com/misaka10843/YouTube-DD-live-status/raw/main/DDLive.json` 这个是文件源码，每10mins更新一次
+`https://github.com/misaka10843/YouTube-DD-live-status/raw/main/DDLive.json` 
+
+这个是文件源码，每10mins更新一次（但是github只能随缘运行了www）
 
 现在大概框架已经做好，以下为`DDLive.json`的示例代码
 
