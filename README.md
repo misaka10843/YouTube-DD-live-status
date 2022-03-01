@@ -53,3 +53,7 @@
 如`www.youtube.com/c/かぐらななななかぐ辛党Ch` 中的`かぐらななななかぐ辛党Ch`
 
 和 `www.youtube.com/channel/UCt30jJgChL8qeT9VPadidSw` 中的`UCt30jJgChL8qeT9VPadidSw`
+
+## 仓库基本情况
+
+![Alt](https://repobeats.axiom.co/api/embed/2e473654161f51946ba290542ecf3ed87ff2b75b.svg "Repobeats analytics image")
